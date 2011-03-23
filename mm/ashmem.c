@@ -180,7 +180,7 @@ static int ashmem_open(struct inode *inode, struct file *file)
 	struct ashmem_area *asma;
 	int ret;
 
-	ret = nonseekable_open(inode, file);
+	ret = generic_file_open(inode, file);
 	if (unlikely(ret))
 		return ret;
 
@@ -213,10 +213,71 @@ static int ashmem_release(struct inode *ignored, struct file *file)
 	return 0;
 }
 
+static ssize_t ashmem_read(struct file *file, char __user *buf,
+			   size_t len, loff_t *pos)
+{
+	struct ashmem_area *asma = file->private_data;
+	int ret = 0;
+
+	mutex_lock(&ashmem_mutex);
+
+	/* If size is not set, or set to 0, always return EOF. */
+	if (asma->size == 0) {
+		goto out;
+        }
+
+	if (!asma->file) {
+		ret = -EBADF;
+		goto out;
+	}
+
+	ret = asma->file->f_op->read(asma->file, buf, len, pos);
+	if (ret < 0) {
+		goto out;
+	}
+
+	/** Update backing file pos, since f_ops->read() doesn't */
+	asma->file->f_pos = *pos;
+
+out:
+	mutex_unlock(&ashmem_mutex);
+	return ret;
+}
+
+static loff_t ashmem_llseek(struct file *file, loff_t offset, int origin)
+{
+	struct ashmem_area *asma = file->private_data;
+	int ret;
+
+	mutex_lock(&ashmem_mutex);
+
+	if (asma->size == 0) {
+		ret = -EINVAL;
+		goto out;
+	}
+
+	if (!asma->file) {
+		ret = -EBADF;
+		goto out;
+	}
+
+	ret = asma->file->f_op->llseek(asma->file, offset, origin);
+	if (ret < 0) {
+		goto out;
+	}
+
+	/** Copy f_pos from backing file, since f_ops->llseek() sets it */
+	file->f_pos = asma->file->f_pos;
+
+out:
+	mutex_unlock(&ashmem_mutex);
+	return ret;
+}
+
 static inline unsigned long
 calc_vm_may_flags(unsigned long prot)
 {
-	return _calc_vm_trans(prot, PROT_READ,  VM_MAYREAD) |
+	return _calc_vm_trans(prot, PROT_READ,  VM_MAYREAD ) |
 	       _calc_vm_trans(prot, PROT_WRITE, VM_MAYWRITE) |
 	       _calc_vm_trans(prot, PROT_EXEC,  VM_MAYEXEC);
 }
@@ -299,11 +360,7 @@ static int ashmem_shrink(int nr_to_scan, gfp_t gfp_mask)
 	if (!nr_to_scan)
 		return lru_count;
 
-	/* If our mutex is held, we are recursing into ourselves, so bail out */
-	if (!mutex_trylock(&ashmem_mutex)) {
-		return -1;
-	}
-
+	mutex_lock(&ashmem_mutex);
 	list_for_each_entry_safe(range, next, &ashmem_lru_list, lru) {
 		struct inode *inode = range->asma->file->f_dentry->d_inode;
 		loff_t start = range->pgstart * PAGE_SIZE;
@@ -774,6 +831,8 @@ static struct file_operations ashmem_fops = {
 	.owner = THIS_MODULE,
 	.open = ashmem_open,
 	.release = ashmem_release,
+        .read = ashmem_read,
+        .llseek = ashmem_llseek,
 	.mmap = ashmem_mmap,
 	.unlocked_ioctl = ashmem_ioctl,
 	.compat_ioctl = ashmem_ioctl,
