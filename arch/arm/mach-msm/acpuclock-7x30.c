@@ -80,47 +80,27 @@ struct clkctl_acpu_speed {
 static struct clock_state drv_state = { 0 };
 
 static struct cpufreq_frequency_table freq_table[] = {
-	{ 0, 245760 },
-	{ 1, 368640 },
-	{ 2, 768000 },
-#if defined(CONFIG_MACH_SPADE) || defined(CONFIG_MACH_GLACIER)
-	{ 3, 1017600 },
-	{ 4, 1113600 },
-	{ 5, 1209600 },
-	{ 6, 1305600 },
-	{ 7, 1401600 },
-	{ 8, 1497600 },
-	{ 9, 1516800 },
-#ifndef CONFIG_JESUS_PHONE
-	{ 10, CPUFREQ_TABLE_END },
-#else
-	/* Just an example of some of the insanity I was able to pull off on my
-	   device */
-	{ 10, 1612800 },
-	{ 11, 1708800 },
-	{ 12, 1804800 },
-	{ 13, CPUFREQ_TABLE_END },
-#endif
-#else
-	{ 3, 806400 },
-	{ 4, 1017600 },
-	{ 5, 1113600 },
-	{ 6, 1209600 },
-	{ 7, 1305600 },
-	{ 8, 1401600 },
-	{ 9, 1497600 },
-	{ 10, 1516800 },
-#ifndef CONFIG_JESUS_PHONE
-	{ 11, CPUFREQ_TABLE_END },
-#else
-	/* Just an example of some of the insanity I was able to pull off on my
-	   device */
-	{ 11, 1612800 },
-	{ 12, 1708800 },
-	{ 13, 1804800 },
-	{ 14, CPUFREQ_TABLE_END },
-#endif
-#endif
+	{ 0, 230400 },
+	{ 1, 307200 },
+	{ 2, 384000 },
+	{ 3, 460800 },
+	{ 4, 537600 },
+	{ 5, 614400 },
+	{ 6, 691200 },
+	{ 7, 768000 },
+	{ 8, 844800 },
+	{ 9, 921600 },
+	{ 10, 998400 },
+	{ 11, 1075200 },
+	{ 12, 1152000 },
+	{ 13, 1228800 },
+	{ 14, 1305600 },
+	{ 15, 1382400 },
+	{ 16, 1459200 },
+	{ 17, 1516800 },
+	{ 18, 1612800 },
+	{ 19, CPUFREQ_TABLE_END },
+
 };
 
 /* Use negative numbers for sources that can't be enabled/disabled */
@@ -131,30 +111,27 @@ static struct clkctl_acpu_speed acpu_freq_tbl[] = {
 	{ 61440,  PLL_3,    5, 11, 61440,  900, VDD_RAW(900) },
 	{ 122880, PLL_3,    5, 5,  61440,  900, VDD_RAW(900) },
 	{ 184320, PLL_3,    5, 4,  61440,  900, VDD_RAW(900) },
-	{ MAX_AXI_KHZ, SRC_AXI, 1, 0, 61440, 900, VDD_RAW(900) },
-	{ 245760, PLL_3,    5, 2,  61440,  900, VDD_RAW(900) },
-	{ 368640, PLL_3,    5, 1,  122800, 900, VDD_RAW(900) },
-	{ 768000, PLL_1,    2, 0,  153600, 1050, VDD_RAW(1050) },
-	/* Make sure any freq based from PLL_2 is a multiple of 19200! 
-	   Voltage tables are being very conservative and are not designed to
-	   be an undervolt of any sort. */
-#if defined(CONFIG_MACH_SPADE) || defined(CONFIG_MACH_GLACIER)
-	{ 1017600, PLL_2,   3, 0,  192000, 1100, VDD_RAW(1100) },
-#else
-	{ 806400, PLL_2,    3, 0,  192000, 1100, VDD_RAW(1100) },
-	{ 1017600, PLL_2,   3, 0,  192000, 1200, VDD_RAW(1200) },
-#endif
-	{ 1113600, PLL_2,   3, 0,  192000, 1200, VDD_RAW(1200) },
-	{ 1209600, PLL_2,   3, 0,  192000, 1200, VDD_RAW(1200) },
-	{ 1305600, PLL_2,   3, 0,  192000, 1200, VDD_RAW(1200) },
-	{ 1401600, PLL_2,   3, 0,  192000, 1300, VDD_RAW(1300) },
-	{ 1497600, PLL_2,   3, 0,  192000, 1300, VDD_RAW(1300) },
+      { MAX_AXI_KHZ, SRC_AXI, 1, 0, 61440, 900, VDD_RAW(900) },
+//	{ 245000, PLL_3,    5, 2,  122500, 900, VDD_RAW(850) },
+	{ 230400, PLL_3,    5, 1,  192000, 900, VDD_RAW(850) },
+	{ 307200, PLL_3,    5, 1,  192000, 900, VDD_RAW(875) },
+	{ 384000, PLL_1,    2, 0,  192000, 925, VDD_RAW(900) },
+	{ 460800, PLL_3,    5, 1,  192000, 950, VDD_RAW(925) },
+	{ 537600, PLL_2,    3, 0,  192000, 975, VDD_RAW(950) },
+	{ 614400, PLL_2,    3, 0,  192000, 975, VDD_RAW(975) },
+	{ 691200, PLL_2,    3, 0,  192000, 1000, VDD_RAW(1000) },
+	{ 768000, PLL_2,    3, 0,  192000, 1025, VDD_RAW(1000) },
+	{ 844800, PLL_2,    3, 0,  192000, 1025, VDD_RAW(1025) },
+	{ 921600, PLL_2,    3, 0,  192000, 1050, VDD_RAW(1050) },
+	{ 998400, PLL_2,    3, 0,  192000, 1050, VDD_RAW(1050) },
+	{ 1075200, PLL_2,   3, 0,  192000, 1075, VDD_RAW(1075) },
+	{ 1152000, PLL_2,   3, 0,  192000, 1075, VDD_RAW(1075) },
+	{ 1228800, PLL_2,   3, 0,  192000, 1100, VDD_RAW(1100) },
+	{ 1305600, PLL_2,   3, 0,  192000, 1175, VDD_RAW(1175) },
+	{ 1382400, PLL_2,   3, 0,  192000, 1200, VDD_RAW(1200) },
+	{ 1459200, PLL_2,   3, 0,  192000, 1225, VDD_RAW(1225) },
 	{ 1516800, PLL_2,   3, 0,  192000, 1300, VDD_RAW(1300) },
-#ifdef CONFIG_JESUS_PHONE
 	{ 1612800, PLL_2,   3, 0,  192000, 1400, VDD_RAW(1400) },
-	{ 1708800, PLL_2,   3, 0,  192000, 1400, VDD_RAW(1400) },
-	{ 1804800, PLL_2,   3, 0,  192000, 1450, VDD_RAW(1450) },
-#endif
 	{ 0 }
 };
 static unsigned long max_axi_rate;
