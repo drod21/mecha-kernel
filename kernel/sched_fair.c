@@ -1364,7 +1364,7 @@ static int select_task_rq_fair(struct task_struct *p, int sd_flag, int wake_flag
 	int cpu = smp_processor_id();
 	int prev_cpu = task_cpu(p);
 	int new_cpu = cpu;
-	int want_affine = 0;
+	int want_affine = 0, cpu_idle = !current->pid;
 	int want_sd = 1;
 	int sync = wake_flags & WF_SYNC;
 
@@ -1448,6 +1448,7 @@ static int select_task_rq_fair(struct task_struct *p, int sd_flag, int wake_flag
 			sd = tmp;
 	}
 
+#ifdef CONFIG_FAIR_GROUP_SCHED
 	if (sched_feat(LB_SHARES_UPDATE)) {
 		/*
 		 * Pick the largest domain to update shares over
@@ -1459,9 +1460,12 @@ static int select_task_rq_fair(struct task_struct *p, int sd_flag, int wake_flag
 		if (tmp)
 			update_shares(tmp);
 	}
+#endif
 
-	if (affine_sd && wake_affine(affine_sd, p, sync)) {
-		new_cpu = cpu;
+ 		if (affine_sd) {
+               if (cpu_idle || cpu == prev_cpu || wake_affine(affine_sd, p, sync))
+                       return cpu;
+       }
 		goto out;
 	}
 
