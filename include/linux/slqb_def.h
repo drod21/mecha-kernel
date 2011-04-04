@@ -20,7 +20,7 @@ enum stat_item {
 	ALLOC,			/* Allocation count */
 	ALLOC_SLAB_FILL,	/* Fill freelist from page list */
 	ALLOC_SLAB_NEW,		/* New slab acquired from page allocator */
-	FREE,			/* Free count */
+	FREE_C,			/* Free count */
 	FREE_REMOTE,		/* NUMA: freeing to remote list */
 	FLUSH_FREE_LIST,	/* Freelist flushed */
 	FLUSH_FREE_LIST_OBJECTS, /* Objects flushed from freelist */

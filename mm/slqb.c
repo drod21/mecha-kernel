@@ -1749,7 +1749,7 @@ static __always_inline void __slab_free(struct kmem_cache *s,
 	c = get_cpu_slab(s, thiscpu);
 	l = &c->list;
 
-	slqb_stat_inc(l, FREE);
+	slqb_stat_inc(l, FREE_C);
 
 	if (!NUMA_BUILD || !slab_numa(s) ||
 			likely(slqb_page_to_nid(page) == numa_node_id())) {
