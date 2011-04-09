@@ -279,7 +279,7 @@ static int sm501fb_check_var(struct fb_var_screeninfo *var,
 
 	/* check we can fit these values into the registers */
 
-	if (var->hsync_len > 255 || var->vsync_len > 63)
+	if (var->hsync_len > 255 || var->vsync_len > 70)
 		return -EINVAL;
 
 	/* hdisplay end and hsync start */
